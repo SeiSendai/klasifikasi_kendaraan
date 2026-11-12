@@ -4,27 +4,21 @@ import numpy as np
 import pandas as pd
 from PIL import Image
 
-st.set_page_config(
-    page_title="Car Type Classification AI",
-    page_icon="🚗",
-    layout="wide"
-)
+st.set_page_config(page_title="Car Type Classification", page_icon="🚗", layout="wide")
 
 CLASS_NAMES = ['Hatchback', 'Other', 'Pickup', 'Sedan', 'SUV']
 
 @st.cache_resource
 def load_cnn_model():
-    return tf.keras.models.load_model('model_custom_cnn.keras', compile=False)
+    model = tf.keras.models.load_model('model_custom_cnn.keras', compile=False)
+    # Warm-up model agar inferensi pertama langsung responsif
+    dummy_input = tf.zeros((1, 128, 128, 3))
+    _ = model(dummy_input, training=False)
+    return model
 
-try:
-    model = load_cnn_model()
-except Exception:
-    st.error("File model 'model_custom_cnn.keras' tidak ditemukan!")
-    st.stop()
+model = load_cnn_model()
 
 st.title("🚗 Car Type Classification — Custom CNN")
-st.write("Klasifikasi 5 jenis mobil menggunakan Custom CNN.")
-
 uploaded_file = st.file_uploader("Unggah foto mobil...", type=["jpg", "jpeg", "png"])
 
 if uploaded_file is not None:
@@ -36,7 +30,7 @@ if uploaded_file is not None:
         
     with col2:
         with st.spinner('Memproses citra...'):
-            img_resized = image.resize((128, 128))
+            img_resized = image.resize((128, 128), Image.Resampling.LANCZOS)
             img_array = np.array(img_resized, dtype=np.float32)
             
             if img_array.max() > 1.0:
@@ -54,9 +48,4 @@ if uploaded_file is not None:
             st.metric(label="Confidence", value=f"{confidence:.2f}%")
 
     st.markdown("---")
-    prob_df = pd.DataFrame({
-        'Jenis Mobil': CLASS_NAMES,
-        'Probabilitas (%)': np.round(preds * 100, 2)
-    }).sort_values(by='Probabilitas (%)', ascending=False)
-    
-    st.bar_chart(prob_df.set_index('Jenis Mobil'))
+    st.bar_chart(pd.DataFrame({'Probabilitas (%)': np.round(preds * 100, 2)}, index=CLASS_NAMES))
