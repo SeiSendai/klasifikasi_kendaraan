@@ -6,7 +6,7 @@ from PIL import Image
 
 st.set_page_config(page_title="Vehicle Type Classification", page_icon="🚗", layout="wide")
 
-CLASS_NAMES = ['Bus', 'Car', 'Motorcycle', 'Truck']
+CLASS_NAMES = ['Hatchback', 'Other', 'Pickup', 'Sedan', 'SUV']
 
 @st.cache_resource
 def load_cnn_model():
@@ -18,7 +18,7 @@ except Exception as e:
     st.error("File 'model_custom_cnn.keras' tidak ditemukan. Pastikan file model berada di folder yang sama dengan app.py.")
     st.stop()
 
-st.title("🚗 Vehicle Type Classification — Custom CNN")
+st.title("Vehicle Type Classification — Custom CNN")
 st.write("Aplikasi klasifikasi jenis kendaraan menggunakan arsitektur **Custom Convolutional Neural Network (TensorFlow/Keras)**.")
 
 with st.sidebar:
