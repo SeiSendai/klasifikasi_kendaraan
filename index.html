@@ -10,9 +10,9 @@
   <style>
     body { font-family: 'Plus Jakarta Sans', sans-serif; }
     .glass {
-      background: rgba(30, 41, 59, 0.72);
-      backdrop-filter: blur(14px);
-      border: 1px solid rgba(148, 163, 184, 0.15);
+      background: rgba(15, 23, 42, 0.78);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(148, 163, 184, 0.14);
     }
     .gradient-text {
       background: linear-gradient(135deg, #38bdf8, #818cf8, #c084fc);
@@ -23,20 +23,19 @@
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen selection:bg-indigo-500 selection:text-white">
 
-  <!-- Navbar -->
   <nav class="sticky top-0 z-50 glass border-b border-slate-800/80">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
       <div class="flex items-center gap-3">
-        <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-sky-500 to-indigo-600 flex items-center justify-center font-bold text-white shadow-lg shadow-indigo-500/30">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-sky-500 to-indigo-600 flex items-center justify-center font-extrabold text-white shadow-lg shadow-indigo-500/25">
           CT
         </div>
         <div>
           <span class="font-bold text-lg tracking-tight">CarType <span class="gradient-text">Vision AI</span></span>
-          <span class="hidden sm:inline-block ml-2 text-xs px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-300 border border-indigo-500/20">Custom CNN • 5 Kelas Mobil</span>
+          <span class="hidden sm:inline-block ml-2 text-xs px-2.5 py-0.5 rounded-full bg-indigo-500/10 text-indigo-300 border border-indigo-500/20">Custom CNN • TensorFlow/Keras</span>
         </div>
       </div>
 
-      <div class="flex items-center gap-2 bg-slate-900/90 p-1 rounded-xl border border-slate-800">
+      <div class="flex items-center gap-1.5 bg-slate-900/90 p-1 rounded-xl border border-slate-800">
         <button onclick="switchTab('inference')" id="tab-inference" class="tab-btn px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-indigo-600 text-white transition">Live Klasifikasi</button>
         <button onclick="switchTab('architecture')" id="tab-architecture" class="tab-btn px-3.5 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-white transition">Arsitektur CNN</button>
         <button onclick="switchTab('evaluation')" id="tab-evaluation" class="tab-btn px-3.5 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-white transition">Evaluasi Model</button>
@@ -44,17 +43,17 @@
     </div>
   </nav>
 
-  <!-- Main Container -->
   <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
-    <!-- TAB 1: LIVE INFERENCE -->
     <section id="view-inference" class="grid grid-cols-1 lg:grid-cols-12 gap-6">
       
-      <!-- Left Column: Upload & Presets -->
       <div class="lg:col-span-5 space-y-6">
         <div class="glass rounded-2xl p-6 shadow-xl">
-          <h2 class="text-base font-bold text-white mb-1">Unggah Citra Mobil</h2>
-          <p class="text-xs text-slate-400 mb-4">Klasifikasi 5 kategori mobil: <strong>Hatchback, Pickup, Sedan, SUV,</strong> dan <strong>Other</strong> (otomatis resize ke 128×128 px).</p>
+          <div class="flex items-center justify-between mb-1">
+            <h2 class="text-base font-bold text-white">Unggah Citra Mobil</h2>
+            <span class="text-[11px] px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">5 Kelas Mobil</span>
+          </div>
+          <p class="text-xs text-slate-400 mb-4">Hatchback • Other • Pickup • Sedan • SUV (Resize 128×128 px)</p>
 
           <label id="dropzone" class="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed border-slate-700 hover:border-sky-400 rounded-xl cursor-pointer bg-slate-900/50 hover:bg-slate-900 transition group">
             <div class="flex flex-col items-center justify-center pt-5 pb-6 text-center px-4">
@@ -67,13 +66,20 @@
             <input id="fileInput" type="file" class="hidden" accept="image/*" />
           </label>
 
-          <!-- Preset Samples (5 Car Classes) -->
           <div class="mt-5">
-            <p class="text-xs font-semibold text-slate-300 mb-2.5">Atau pilih sampel uji 5 kelas mobil:</p>
+            <p class="text-xs font-semibold text-slate-300 mb-2.5">Sampel 5 Kategori Mobil:</p>
             <div class="grid grid-cols-5 gap-2">
               <button onclick="selectPreset('Hatchback', [93.4, 1.5, 1.2, 2.8, 1.1], 'https://images.unsplash.com/photo-1541899481282-d53bffe3c35d?auto=format&fit=crop&w=600&q=80')" class="group relative rounded-xl overflow-hidden border border-slate-700 hover:border-sky-400 transition aspect-square">
                 <img src="https://images.unsplash.com/photo-1541899481282-d53bffe3c35d?auto=format&fit=crop&w=300&q=80" class="w-full h-full object-cover group-hover:scale-110 transition duration-300" alt="Hatchback">
                 <span class="absolute bottom-0 inset-x-0 bg-slate-950/85 text-[9px] font-semibold py-1 text-center">Hatchback</span>
+              </button>
+              <button onclick="selectPreset('Other', [1.9, 89.5, 2.4, 3.1, 3.1], 'https://images.unsplash.com/photo-1544829099-b9a0c07fad1a?auto=format&fit=crop&w=600&q=80')" class="group relative rounded-xl overflow-hidden border border-slate-700 hover:border-sky-400 transition aspect-square">
+                <img src="https://images.unsplash.com/photo-1544829099-b9a0c07fad1a?auto=format&fit=crop&w=300&q=80" class="w-full h-full object-cover group-hover:scale-110 transition duration-300" alt="Other">
+                <span class="absolute bottom-0 inset-x-0 bg-slate-950/85 text-[9px] font-semibold py-1 text-center">Other</span>
+              </button>
+              <button onclick="selectPreset('Pickup', [0.8, 2.2, 93.8, 0.7, 2.5], 'https://images.unsplash.com/photo-1559416523-140ddc3d238c?auto=format&fit=crop&w=600&q=80')" class="group relative rounded-xl overflow-hidden border border-slate-700 hover:border-sky-400 transition aspect-square">
+                <img src="https://images.unsplash.com/photo-1559416523-140ddc3d238c?auto=format&fit=crop&w=300&q=80" class="w-full h-full object-cover group-hover:scale-110 transition duration-300" alt="Pickup">
+                <span class="absolute bottom-0 inset-x-0 bg-slate-950/85 text-[9px] font-semibold py-1 text-center">Pickup</span>
               </button>
               <button onclick="selectPreset('Sedan', [2.1, 1.0, 0.8, 94.6, 1.5], 'https://images.unsplash.com/photo-1555215695-3004980ad54e?auto=format&fit=crop&w=600&q=80')" class="group relative rounded-xl overflow-hidden border border-slate-700 hover:border-sky-400 transition aspect-square">
                 <img src="https://images.unsplash.com/photo-1555215695-3004980ad54e?auto=format&fit=crop&w=300&q=80" class="w-full h-full object-cover group-hover:scale-110 transition duration-300" alt="Sedan">
@@ -83,19 +89,10 @@
                 <img src="https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?auto=format&fit=crop&w=300&q=80" class="w-full h-full object-cover group-hover:scale-110 transition duration-300" alt="SUV">
                 <span class="absolute bottom-0 inset-x-0 bg-slate-950/85 text-[9px] font-semibold py-1 text-center">SUV</span>
               </button>
-              <button onclick="selectPreset('Pickup', [0.8, 2.2, 93.8, 0.7, 2.5], 'https://images.unsplash.com/photo-1559416523-140ddc3d238c?auto=format&fit=crop&w=600&q=80')" class="group relative rounded-xl overflow-hidden border border-slate-700 hover:border-sky-400 transition aspect-square">
-                <img src="https://images.unsplash.com/photo-1559416523-140ddc3d238c?auto=format&fit=crop&w=300&q=80" class="w-full h-full object-cover group-hover:scale-110 transition duration-300" alt="Pickup">
-                <span class="absolute bottom-0 inset-x-0 bg-slate-950/85 text-[9px] font-semibold py-1 text-center">Pickup</span>
-              </button>
-              <button onclick="selectPreset('Other', [1.9, 89.5, 2.4, 3.1, 3.1], 'https://images.unsplash.com/photo-1544829099-b9a0c07fad1a?auto=format&fit=crop&w=600&q=80')" class="group relative rounded-xl overflow-hidden border border-slate-700 hover:border-sky-400 transition aspect-square">
-                <img src="https://images.unsplash.com/photo-1544829099-b9a0c07fad1a?auto=format&fit=crop&w=300&q=80" class="w-full h-full object-cover group-hover:scale-110 transition duration-300" alt="Other">
-                <span class="absolute bottom-0 inset-x-0 bg-slate-950/85 text-[9px] font-semibold py-1 text-center">Other</span>
-              </button>
             </div>
           </div>
         </div>
 
-        <!-- Specs Card -->
         <div class="glass rounded-2xl p-5">
           <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">Spesifikasi Pipeline</h3>
           <div class="grid grid-cols-2 gap-3 text-xs">
@@ -104,32 +101,29 @@
               <span class="font-bold text-slate-100 mt-0.5 block">128 × 128 × 3 (RGB)</span>
             </div>
             <div class="bg-slate-900/70 p-3 rounded-xl border border-slate-800">
-              <span class="text-slate-400 block">Target Kelas (5)</span>
-              <span class="font-bold text-slate-100 mt-0.5 block">Hatchback, Pickup, Sedan, SUV, Other</span>
+              <span class="text-slate-400 block">Normalisasi</span>
+              <span class="font-bold text-slate-100 mt-0.5 block">Pixel / 255.0 [0, 1]</span>
             </div>
             <div class="bg-slate-900/70 p-3 rounded-xl border border-slate-800">
               <span class="text-slate-400 block">Optimizer / Loss</span>
               <span class="font-bold text-slate-100 mt-0.5 block">Adam / Sparse CCE</span>
             </div>
             <div class="bg-slate-900/70 p-3 rounded-xl border border-slate-800">
-              <span class="text-slate-400 block">Bobot Tersimpan</span>
+              <span class="text-slate-400 block">File Bobot</span>
               <span class="font-bold text-sky-400 mt-0.5 block">model_custom_cnn.keras</span>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Right Column: Preview & Results -->
       <div class="lg:col-span-7 space-y-6">
         <div class="glass rounded-2xl p-6 shadow-xl">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
-            <!-- Image Preview -->
             <div class="relative rounded-xl overflow-hidden bg-slate-900 border border-slate-800 aspect-[4/3] flex items-center justify-center">
               <img id="previewImg" src="https://images.unsplash.com/photo-1555215695-3004980ad54e?auto=format&fit=crop&w=600&q=80" alt="Preview Mobil" class="w-full h-full object-cover" />
-              <span class="absolute top-3 left-3 bg-slate-950/80 backdrop-blur px-2.5 py-1 rounded-lg text-[11px] font-medium text-slate-300 border border-slate-700/70">Tensor Input: (1, 128, 128, 3)</span>
+              <span class="absolute top-3 left-3 bg-slate-950/80 backdrop-blur px-2.5 py-1 rounded-lg text-[11px] font-medium text-slate-300 border border-slate-700/70">Tensor: (1, 128, 128, 3)</span>
             </div>
 
-            <!-- Prediction Metrics -->
             <div class="space-y-4">
               <div>
                 <span class="text-xs font-semibold uppercase tracking-wider text-sky-400">Prediksi Jenis Mobil</span>
@@ -147,13 +141,12 @@
               </div>
 
               <div class="flex items-center justify-between text-xs text-slate-400 pt-1">
-                <span>Status Model: <strong class="text-emerald-400">Siap (Best Checkpoint)</strong></span>
+                <span>Model: <strong class="text-slate-200">Custom 4-Block CNN</strong></span>
                 <span>Latensi: <strong id="latencyVal" class="text-slate-200">17 ms</strong></span>
               </div>
             </div>
           </div>
 
-          <!-- Probability Chart -->
           <div class="mt-6 pt-6 border-t border-slate-800/80">
             <h3 class="text-sm font-bold text-white mb-3">Distribusi Probabilitas Tiap Kelas Mobil (%)</h3>
             <div class="h-56">
@@ -164,10 +157,9 @@
       </div>
     </section>
 
-    <!-- TAB 2: ARCHITECTURE -->
     <section id="view-architecture" class="hidden glass rounded-2xl p-6 shadow-xl">
       <h2 class="text-lg font-bold text-white mb-1">Arsitektur Custom CNN (Tanpa Transfer Learning)</h2>
-      <p class="text-xs text-slate-400 mb-6">Dibangun menggunakan <code class="text-sky-400">tf.keras.Sequential</code> dengan 4 blok ekstraksi fitur dan lapisan klasifikasi 5 kelas mobil.</p>
+      <p class="text-xs text-slate-400 mb-6">Sequential Model dengan 4 blok ekstraksi fitur dan classifier 5 kelas mobil.</p>
       
       <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
         <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-800">
@@ -198,10 +190,9 @@
       </div>
     </section>
 
-    <!-- TAB 3: EVALUATION -->
     <section id="view-evaluation" class="hidden glass rounded-2xl p-6 shadow-xl">
       <h2 class="text-lg font-bold text-white mb-1">Evaluasi Model pada Data Testing (5 Kelas Mobil)</h2>
-      <p class="text-xs text-slate-400 mb-6">Ringkasan metrik evaluasi sesuai Modul 4 (Accuracy, Precision, Recall, F1-Score, dan Confusion Matrix 5×5).</p>
+      <p class="text-xs text-slate-400 mb-6">Metrik evaluasi klasifikasi dan Confusion Matrix 5×5.</p>
 
       <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
         <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-800 text-center">
