@@ -5,37 +5,17 @@ from torchvision import transforms
 from PIL import Image
 import os
 
-# 1. Konfigurasi Halaman (Harus di baris pertama perintah Streamlit)
+# Konfigurasi Halaman
 st.set_page_config(
-    page_title="Vehicle Type Classifier", 
+    page_title="Vehicle Type Classification", 
     page_icon="🚗", 
-    layout="wide"
+    layout="centered"
 )
 
-# Custom CSS untuk memperindah tampilan
-st.markdown("""
-    <style>
-    .main-title {
-        font-size: 2.2rem;
-        font-weight: 700;
-        color: #1E3A8A;
-        margin-bottom: 0px;
-    }
-    .sub-title {
-        color: #6B7280;
-        font-size: 1rem;
-        margin-bottom: 2rem;
-    }
-    .result-card {
-        background-color: #F3F4F6;
-        padding: 20px;
-        border-radius: 10px;
-        border-left: 5px solid #3B82F6;
-    }
-    </style>
-""", unsafe_allow_html=True)
+st.title("🚗 Klasifikasi Jenis Kendaraan")
+st.write("Aplikasi web berbasis PyTorch untuk mendeteksi kategori kendaraan dari gambar.")
 
-# 2. Definisikan Arsitektur Model Custom CNN
+# 1. Definisikan Arsitektur Model Custom CNN
 class CustomCNN(nn.Module):
     def __init__(self, num_classes):
         super(CustomCNN, self).__init__()
@@ -58,7 +38,7 @@ class CustomCNN(nn.Module):
         x = self.classifier(x)
         return x
 
-# 3. Fungsi Load Model dengan Cache
+# 2. Fungsi Load Model dengan Cache
 @st.cache_resource
 def load_model():
     model_path = 'model_custom_cnn.pth'
@@ -73,45 +53,36 @@ def load_model():
     model.eval()
     return model, class_names
 
-# 4. Header Utama Aplikasi
-st.markdown('<p class="main-title">🚗 Vehicle Type Classification App</p>', unsafe_allow_html=True)
-st.markdown('<p class="sub-title">Sistem Klasifikasi Jenis Kendaraan Berbasis PyTorch & Custom CNN</p>', unsafe_allow_html=True)
-
 model, class_names = load_model()
 
 if model is None:
-    st.error("⚠️ File bobot model `model_custom_cnn.pth` tidak ditemukan di direktori! Pastikan Anda sudah mengunggah atau melatih model terlebih dahulu.")
+    st.error("⚠️ File bobot model `model_custom_cnn.pth` tidak ditemukan! Pastikan file model berada di folder yang sama dengan `app.py`.")
 else:
-    # Sidebar Informasi
+    # Sidebar untuk menampilkan daftar kelas
     with st.sidebar:
-        st.header("ℹ️ Informasi Model")
-        st.write("Aplikasi ini mendeteksi kategori kendaraan berdasarkan pelatihan model *Custom Convolutional Neural Network*.")
-        st.markdown("---")
-        st.markdown("**Kelas Kendaraan yang Dikenali:**")
+        st.header("📋 Daftar Kelas Kendaraan")
+        st.write("Model ini mengenali kategori berikut:")
         for name in class_names:
             st.code(name)
-        st.markdown("---")
-        st.info("💡 **Tips:** Gunakan gambar yang karakteristiknya mirip dengan data latih dataset untuk hasil prediksi optimal.")
 
-    # Layout Utama Menjadi 2 Kolom (Kiri: Upload & Gambar, Kanan: Hasil Prediksi)
-    col1, col2 = st.columns([1, 1], gap="large")
+    # Widget Upload File
+    uploaded_file = st.file_uploader("Pilih gambar kendaraan (JPG, PNG)...", type=["jpg", "jpeg", "png"])
 
-    with col1:
-        st.subheader("📁 Unggah Gambar")
-        uploaded_file = st.file_uploader("Pilih gambar kendaraan...", type=["jpg", "jpeg", "png"])
+    if uploaded_file is not None:
+        st.write("---")
+        # Membuat 2 kolom rapi: Kiri untuk gambar, Kanan untuk hasil
+        col1, col2 = st.columns(2, gap="medium")
 
-        if uploaded_file is not None:
+        with col1:
+            st.subheader("🖼️ Gambar Masukan")
             image = Image.open(uploaded_file).convert("RGB")
-            st.image(image, caption="Pratinjau Gambar", use_container_width=True)
-        else:
-            st.info("Silakan unggah file gambar (JPG/PNG) di atas untuk memulai.")
+            st.image(image, use_container_width=True)
 
-    with col2:
-        st.subheader("📊 Hasil Prediksi")
-        
-        if uploaded_file is not None:
-            if st.button("🔍 Jalankan Prediksi", type="primary", use_container_width=True):
-                with st.spinner("Model sedang menganalisis fitur gambar..."):
+        with col2:
+            st.subheader("📊 Hasil Prediksi")
+            
+            if st.button("🔍 Prediksi Gambar", type="primary", use_container_width=True):
+                with st.spinner("Sedang memproses..."):
                     # Preprocessing
                     transform = transforms.Compose([
                         transforms.Resize((128, 128)),
@@ -130,21 +101,15 @@ else:
                     predicted_class = class_names[predicted_idx.item()]
                     confidence_score = confidence.item() * 100
                 
-                # Tampilkan Hasil di Kotak Khusus
-                st.markdown(f"""
-                    <div class="result-card">
-                        <h3>Prediksi Utama: <span style="color: #2563EB;">{predicted_class.upper()}</span></h3>
-                        <p>Tingkat Kepercayaan: <b>{confidence_score:.2f}%</b></p>
-                    </div>
-                """, unsafe_allow_html=True)
+                # Tampilkan hasil dengan komponen native streamlit
+                st.success(f"**Prediksi Utama:** {predicted_class.upper()}")
+                st.metric(label="Tingkat Keyakinan (Confidence)", value=f"{confidence_score:.2f}%")
                 
-                st.write("")
-                st.markdown("#### Detail Probabilitas per Kategori:")
-                
-                # Tampilkan Progress Bar untuk setiap kelas
+                st.write("---")
+                st.write("**Probabilitas Seluruh Kelas:**")
                 for idx, prob in enumerate(probabilities):
                     p_val = prob.item()
-                    st.text(f"{class_names[idx]} ({p_val * 100:.1f}%)")
+                    st.text(f"{class_names[idx]}: {p_val * 100:.1f}%")
                     st.progress(p_val)
-        else:
-            st.warning("Belum ada gambar yang diunggah. Silakan unggah gambar di sebelah kiri.")
+    else:
+        st.info("💡 Silakan unggah gambar kendaraan melalui tombol di atas untuk memulai analisis.")
