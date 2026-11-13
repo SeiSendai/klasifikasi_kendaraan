@@ -1,51 +1,34 @@
 import streamlit as st
 import tensorflow as tf
 import numpy as np
-import pandas as pd
 from PIL import Image
 
-st.set_page_config(page_title="Car Type Classification", page_icon="🚗", layout="wide")
-
-CLASS_NAMES = ['Hatchback', 'Other', 'Pickup', 'Sedan', 'SUV']
-
 @st.cache_resource
-def load_cnn_model():
-    model = tf.keras.models.load_model('model_custom_cnn.keras', compile=False)
-    # Warm-up model agar inferensi pertama langsung responsif
-    dummy_input = tf.zeros((1, 128, 128, 3))
-    _ = model(dummy_input, training=False)
-    return model
+def load_model():
+    return tf.keras.models.load_model("model_custom_cnn.keras")
 
-model = load_cnn_model()
+model = load_model()
+IMAGE_SIZE = 128 
+CLASSES = ['Hatchback', 'Other', 'Pickup', 'Sedan', 'SUV']
 
-st.title("🚗 Car Type Classification — Custom CNN")
-uploaded_file = st.file_uploader("Unggah foto mobil...", type=["jpg", "jpeg", "png"])
+st.title("Klasifikasi Citra Custom CNN (.keras)")
+st.write("Unggah gambar kendaraan untuk diprediksi oleh model.")
+
+uploaded_file = st.file_uploader("Pilih gambar...", type=["jpg", "jpeg", "png"])
 
 if uploaded_file is not None:
     image = Image.open(uploaded_file).convert('RGB')
-    
-    col1, col2 = st.columns(2)
-    with col1:
-        st.image(image, use_container_width=True)
-        
-    with col2:
-        with st.spinner('Memproses citra...'):
-            img_resized = image.resize((128, 128), Image.Resampling.LANCZOS)
-            img_array = np.array(img_resized, dtype=np.float32)
-            
-            if img_array.max() > 1.0:
-                img_array = img_array / 255.0
-                
-            img_tensor = np.expand_dims(img_array, axis=0)
-            
-            preds = model(img_tensor, training=False).numpy()[0]
-            
-            top_idx = int(np.argmax(preds))
-            predicted_label = CLASS_NAMES[top_idx]
-            confidence = float(preds[top_idx]) * 100
-            
-            st.success(f"**Jenis Mobil:** {predicted_label}")
-            st.metric(label="Confidence", value=f"{confidence:.2f}%")
+    st.image(image, caption='Gambar yang diunggah', use_column_width=True)
 
-    st.markdown("---")
-    st.bar_chart(pd.DataFrame({'Probabilitas (%)': np.round(preds * 100, 2)}, index=CLASS_NAMES))
+    # Preprocessing
+    img = image.resize((IMAGE_SIZE, IMAGE_SIZE))
+    x = np.array(img) / 255.0
+    x = np.expand_dims(x, axis=0)
+
+    # Prediksi
+    predictions = model.predict(x)
+    predicted_index = int(np.argmax(predictions[0]))
+    confidence = float(np.max(predictions[0])) * 100
+
+    st.subheader(f"Hasil Prediksi: {CLASSES[predicted_index]}")
+    st.write(f"Tingkat Kepercayaan: {confidence:.2f}%")
